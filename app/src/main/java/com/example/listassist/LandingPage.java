@@ -85,12 +85,15 @@ public class LandingPage extends AppCompatActivity {
             mUserInfoDisplay.setText(mUser.getUsername()+ "!");
 
             mItemsListView = findViewById(R.id.listView);
+
+            List<ListItem> items = mListAssistDAO.getListItemByUserByID(mUser.getUserID());
             mItemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
             mItemsListView.setAdapter(mItemsAdapter);
-            List<ListItem> items = mListAssistDAO.getListItemByUserByID(mUser.getUserID());
+
             for (ListItem item : items) {
                 mItemsAdapter.add(item.getListItem());
             }
+
 
             mItemsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
@@ -114,35 +117,17 @@ public class LandingPage extends AppCompatActivity {
                     showAddTaskDialog();
                 }
             });
-
+            Button logoutButton = findViewById(R.id.logout_button);
+            logoutButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    logout();
+                }
+            });
 
         }
-
-        mItemsListView = findViewById(R.id.listView);
-        mItemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-        mItemsListView.setAdapter(mItemsAdapter);
-        List<ListItem> items = mListAssistDAO.getListItemByUserByID(mUser.getUserID());
-        for (ListItem item : items) {
-            mItemsAdapter.add(item.getListItem());
-        }
-
-        // Add this code to set an OnItemLongClickListener
-        mItemsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                deleteTask(position);
-                return true;
-            }
-        });
-
-        Button addTaskButton = findViewById(R.id.button);
-        addTaskButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAddTaskDialog();
-            }
-        });
     }
+
 
 
 
@@ -187,8 +172,18 @@ public class LandingPage extends AppCompatActivity {
         ListItem listItem = new ListItem(mUser.getUserID(), taskText, priority);
         mListAssistDAO.insert(listItem);
         mItemsAdapter.add(listItem.getListItem());
-
     }
+
+    private void logout() {
+        mUserID = -1;
+        SharedPreferences preferences = getSharedPreferences(PREFERENCES_KEY, Context.MODE_PRIVATE);
+        preferences.edit().remove(USER_ID_KEY).apply();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+
 
     private void deleteTask(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -220,10 +215,11 @@ public class LandingPage extends AppCompatActivity {
         listItem.setListItem(newText);
         listItem.setPriority(priority);
         mListAssistDAO.update(listItem);
-        mItemsAdapter.remove(mItemsAdapter.getItem(position)); // Use mItemsAdapter.getItem(position) instead of getItem(position)
-        mItemsAdapter.insert(listItem.getListItem(), position); // Use listItem.getListItem() instead of listItem
+        mItemsAdapter.remove(mItemsAdapter.getItem(position));
+        mItemsAdapter.insert(listItem.getListItem(), position);
         mItemsAdapter.notifyDataSetChanged();
     }
+
 
 
     private void showEditTaskDialog(final int position) {
