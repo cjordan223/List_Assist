@@ -1,6 +1,7 @@
 package com.example.listassist;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.example.listassist.db.AppDatabase;
@@ -14,15 +15,23 @@ public class ListItem {
    private int mUserID;
    private Date mDate;
    private String mListItem;
+   private int mPriority;
 
-
-   public ListItem(int userID, String listItem){
+   @Ignore
+   public ListItem(int userID, String listItem) {
       mUserID = userID;
       mListItem = listItem;
       mDate = new Date();
+      mPriority = 0;
    }
 
 
+   public ListItem(int userID, String listItem, int priority) {
+      mUserID = userID;
+      mListItem = listItem;
+      mDate = new Date();
+      mPriority = priority;
+   }
 
    public int getListID() {
       return mListID;
@@ -36,6 +45,13 @@ public class ListItem {
       return mDate;
    }
 
+   public String getListItem() {
+      return mListItem;
+   }
+
+   public int getPriority() {
+      return mPriority;
+   }
 
    public void setListID(int mListID) {
       this.mListID = mListID;
@@ -49,11 +65,11 @@ public class ListItem {
       this.mDate = mDate;
    }
 
-   public String getListItem() {
-      return mListItem;
-   }
-
    public void setListItem(String mListItem) {
       this.mListItem = mListItem;
+   }
+
+   public void setPriority(int mPriority) {
+      this.mPriority = mPriority;
    }
 }

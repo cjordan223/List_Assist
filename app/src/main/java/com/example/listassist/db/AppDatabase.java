@@ -8,7 +8,7 @@ import com.example.listassist.ListItem;
 import com.example.listassist.User;
 import com.example.listassist.db.typeConverters.DateTypeConverter;
 
-@Database(entities = {User.class, ListItem.class}, version = 3)
+@Database(entities = {User.class, ListItem.class}, version = 4)
 @TypeConverters(DateTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     public static final String DB_NAME ="LISTASSIST_DATABASE";

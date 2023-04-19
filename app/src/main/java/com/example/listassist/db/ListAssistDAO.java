@@ -44,6 +44,9 @@ public interface ListAssistDAO {
     @Query("SELECT * FROM " + AppDatabase.LIST_TABLE + " WHERE mUserID = :userID")
     List<ListItem> getListItemByUserByID(int userID);
 
+    @Query("SELECT * FROM " + AppDatabase.LIST_TABLE + " WHERE mUserID = :userID AND mPriority = :priority")
+    List<ListItem> getListItemByUserAndPriority(int userID, int priority);
+
     @Query("DELETE FROM " + AppDatabase.USER_TABLE)
     void purgeUserTable();
 

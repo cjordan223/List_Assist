@@ -13,6 +13,8 @@ import android.text.InputType;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ArrayAdapter;
@@ -55,19 +57,12 @@ public class LandingPage extends AppCompatActivity {
         checkForUser();
         mUser = mListAssistDAO.getUserByID(mUserID);
 
-
-
-
         if(mUser.getUserID() == 2){
             setContentView(R.layout.admin_landing_page);
             mAdminDisplay = findViewById(R.id.welcomeadminview);
             mDeleteButton = findViewById(R.id.deleteuserbutton);
             mAddButton = findViewById(R.id.adduserbutton);
             mAdminButton  = findViewById(R.id.adminbutton);
-
-
-
-
 
             mAdminButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -97,11 +92,11 @@ public class LandingPage extends AppCompatActivity {
                 mItemsAdapter.add(item.getListItem());
             }
 
-            Button addTaskButton = findViewById(R.id.button);
-            addTaskButton.setOnClickListener(new View.OnClickListener() {
+            mItemsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
-                public void onClick(View v) {
-                    showAddTaskDialog();
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    deleteTask(position);
+                    return true;
                 }
             });
 
@@ -109,6 +104,14 @@ public class LandingPage extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     showEditTaskDialog(position);
+                }
+            });
+
+            Button addTaskButton = findViewById(R.id.button);
+            addTaskButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showAddTaskDialog();
                 }
             });
 
@@ -152,11 +155,21 @@ public class LandingPage extends AppCompatActivity {
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 
+        //priority
+        final CheckBox highPriorityCheckbox = new CheckBox(this);
+        highPriorityCheckbox.setText("High Priority");
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(input);
+        linearLayout.addView(highPriorityCheckbox);
+        builder.setView(linearLayout);
+
         builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String taskText = input.getText().toString();
-                addTask(taskText);
+                int priority = highPriorityCheckbox.isChecked() ? 1 : 0;
+                addTask(taskText, priority);
             }
         });
 
@@ -170,10 +183,11 @@ public class LandingPage extends AppCompatActivity {
         builder.show();
     }
 
-    private void addTask(String taskText) {
-        ListItem listItem = new ListItem(mUser.getUserID(), taskText);
+    private void addTask(String taskText, int priority) {
+        ListItem listItem = new ListItem(mUser.getUserID(), taskText, priority);
         mListAssistDAO.insert(listItem);
-        mItemsAdapter.add(taskText);
+        mItemsAdapter.add(listItem.getListItem());
+
     }
 
     private void deleteTask(final int position) {
@@ -201,14 +215,16 @@ public class LandingPage extends AppCompatActivity {
         builder.show();
     }
 
-    private void editTask(final int position, String newText) {
+    private void editTask(final int position, String newText, int priority) {
         ListItem listItem = mListAssistDAO.getListItemByUserByID(mUser.getUserID()).get(position);
         listItem.setListItem(newText);
+        listItem.setPriority(priority);
         mListAssistDAO.update(listItem);
-        mItemsAdapter.remove(mItemsAdapter.getItem(position));
-        mItemsAdapter.insert(newText, position);
+        mItemsAdapter.remove(mItemsAdapter.getItem(position)); // Use mItemsAdapter.getItem(position) instead of getItem(position)
+        mItemsAdapter.insert(listItem.getListItem(), position); // Use listItem.getListItem() instead of listItem
         mItemsAdapter.notifyDataSetChanged();
     }
+
 
     private void showEditTaskDialog(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -219,11 +235,24 @@ public class LandingPage extends AppCompatActivity {
         input.setText(mItemsAdapter.getItem(position));
         builder.setView(input);
 
+        final CheckBox highPriorityCheckbox = new CheckBox(this);
+        highPriorityCheckbox.setText("High Priority");
+        highPriorityCheckbox.setChecked(mListAssistDAO.getListItemByUserByID(mUser.getUserID()).get(position).getPriority() == 1);
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(input);
+        linearLayout.addView(highPriorityCheckbox);
+        builder.setView(linearLayout);
+
         builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newText = input.getText().toString();
-                editTask(position, newText);
+                int priority1 = highPriorityCheckbox.isChecked() ? 1 : 0;
+                editTask(position, newText, priority1);
+//START HERE
+                int priority2 = highPriorityCheckbox.isChecked() ? 1 : 0;
+                editTask(position, newText, priority2);
             }
         });
 

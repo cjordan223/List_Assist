@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "a75feb1cf8e76813d48f2325cf441dcc",
+    "identityHash": "158449fe565bff72cd40bc3da01eec7d",
     "entities": [
       {
         "tableName": "USER_TABLE",
@@ -50,7 +50,7 @@
       },
       {
         "tableName": "LIST_TABLE",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mListID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `mUserID` INTEGER NOT NULL, `mDate` INTEGER, `mListItem` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mListID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `mUserID` INTEGER NOT NULL, `mDate` INTEGER, `mListItem` TEXT, `mPriority` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "mListID",
@@ -75,6 +75,12 @@
             "columnName": "mListItem",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "mPriority",
+            "columnName": "mPriority",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -90,7 +96,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a75feb1cf8e76813d48f2325cf441dcc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '158449fe565bff72cd40bc3da01eec7d')"
     ]
   }
 }
