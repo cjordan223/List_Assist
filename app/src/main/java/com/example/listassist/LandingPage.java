@@ -40,6 +40,7 @@ public class LandingPage extends AppCompatActivity {
     TextView mUserInfoDisplay;
     Button mAdminButton;
     User mUser;
+
     TextView mAdminDisplay;
     Button mDeleteButton;
     Button mAddButton;
@@ -77,6 +78,23 @@ public class LandingPage extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+            mAddButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent  = AddUserActivity.getIntent(getApplicationContext());
+                    startActivity(intent);
+                }
+            });
+
+
+
+            Button logoutButton = findViewById(R.id.logout_button);
+            logoutButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    logout();
+                }
+            });
 
         }else{
             setContentView(R.layout.activity_landing_page);
@@ -85,7 +103,7 @@ public class LandingPage extends AppCompatActivity {
             mUserInfoDisplay.setText(mUser.getUsername()+ "!");
 
             mItemsListView = findViewById(R.id.listView);
-
+/////
             List<ListItem> items = mListAssistDAO.getListItemByUserByID(mUser.getUserID());
             mItemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
             mItemsListView.setAdapter(mItemsAdapter);
@@ -93,7 +111,7 @@ public class LandingPage extends AppCompatActivity {
             for (ListItem item : items) {
                 mItemsAdapter.add(item.getListItem());
             }
-
+/////
 
             mItemsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
@@ -153,8 +171,10 @@ public class LandingPage extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String taskText = input.getText().toString();
-                int priority = highPriorityCheckbox.isChecked() ? 1 : 0;
-                addTask(taskText, priority);
+                int priority1 = highPriorityCheckbox.isChecked() ? 1 : 0;
+                if (!taskText.isEmpty()) { // add a check here to make sure the task text is not empty
+                    addTask(taskText, priority1);
+                }
             }
         });
 
@@ -167,6 +187,7 @@ public class LandingPage extends AppCompatActivity {
 
         builder.show();
     }
+
 
     private void addTask(String taskText, int priority) {
         ListItem listItem = new ListItem(mUser.getUserID(), taskText, priority);
@@ -216,9 +237,11 @@ public class LandingPage extends AppCompatActivity {
         listItem.setPriority(priority);
         mListAssistDAO.update(listItem);
         mItemsAdapter.remove(mItemsAdapter.getItem(position));
-        mItemsAdapter.insert(listItem.getListItem(), position);
+        String displayText = priority == 1 ? "★ " + newText : newText;
+        mItemsAdapter.insert(displayText, position);
         mItemsAdapter.notifyDataSetChanged();
     }
+
 
 
 
@@ -246,9 +269,13 @@ public class LandingPage extends AppCompatActivity {
                 String newText = input.getText().toString();
                 int priority1 = highPriorityCheckbox.isChecked() ? 1 : 0;
                 editTask(position, newText, priority1);
-//START HERE
-                int priority2 = highPriorityCheckbox.isChecked() ? 1 : 0;
-                editTask(position, newText, priority2);
+
+                // Update check box status
+                if (priority1 == 1) {
+                    mItemsListView.setItemChecked(position, true);
+                } else {
+                    mItemsListView.setItemChecked(position, false);
+                }
             }
         });
 
@@ -261,6 +288,9 @@ public class LandingPage extends AppCompatActivity {
 
         builder.show();
     }
+
+
+
 
     private void getDatabase(){
         mListAssistDAO = Room.databaseBuilder(this, AppDatabase.class, AppDatabase.DB_NAME)

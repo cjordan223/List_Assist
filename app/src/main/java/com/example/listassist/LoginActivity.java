@@ -26,6 +26,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button mLoginButton;
     private ListAssistDAO mListAssistDAO;
     private int mUserId = -1;
+    private Button mGoBackButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,15 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }
 
+            }
+        });
+
+        mGoBackButton = findViewById(R.id.goBackButton);
+        mGoBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
     }
